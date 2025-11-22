@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Marks Calculator</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body { background: #f0f2f5; }
+        .card { border-radius: 15px; }
+        .header-bar {
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+
+<body class="container py-4">
+
+    <div class="header-bar">
+        <h2>📘 SRM M Tech Internal Marks Calculator</h2>
+        <p>Select subject → Fill marks → Get internal score + required theory in Semester score</p>
+    </div>
+
+    <form method="POST">
+
+        <!-- SUBJECT SELECTION -->
+        <div class="card p-4 mb-4">
+            <h4 class="mb-3">Select Your Subject</h4>
+            <select id="subjectSelector" name="subject" class="form-select" required>
+                <option value="">-- Choose Subject --</option>
+                <option value="FAI">Fundamentals of Artificial Intelligence (J)</option>
+                <option value="ML">Machine Learning Algorithms (J)</option>
+                <option value="RMPE">Research Methodology & Professional Ethics (J)</option>
+                <option value="IS">Inferential Statistics (T)</option>
+            </select>
+        </div>
+
+        <!-- J TYPE SECTION -->
+        <div id="J_section" class="card p-4 mb-4 hidden">
+            <h4 class="mb-3">J-Type Marks (FAI / ML / RMPE)</h4>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label>CT1 Theory (out of 40)</label>
+                    <input type="number" name="ct1_theory" class="form-control" min="0" max="40">
+                </div>
+
+                <div class="col-md-6">
+                    <label>CT1 Practical (out of 5)</label>
+                    <input type="number" name="ct1_prac" class="form-control" min="0" max="5">
+                </div>
+
+                <div class="col-md-6">
+                    <label>CT2 Theory (out of 40)</label>
+                    <input type="number" name="ct2_theory" class="form-control" min="0" max="40">
+                </div>
+
+                <div class="col-md-6">
+                    <label>CT2 Practical (out of 5)</label>
+                    <input type="number" name="ct2_prac" class="form-control" min="0" max="5">
+                </div>
+
+                <div class="col-md-6">
+                    <label>LLJ Project (out of 15)</label>
+                    <input type="number" name="llj" class="form-control" min="0" max="15">
+                </div>
+
+                <div class="col-md-6">
+                    <label>Quiz 1 (out of 15)</label>
+                    <input type="number" name="quiz1" class="form-control" min="0" max="15">
+                </div>
+
+                <div class="col-md-6">
+                    <label>Quiz 2 (out of 15)</label>
+                    <input type="number" name="quiz2" class="form-control" min="0" max="15">
+                </div>
+            </div>
+        </div>
+
+        <!-- T TYPE SECTION -->
+        <div id="T_section" class="card p-4 mb-4 hidden">
+            <h4 class="mb-3">T-Type Marks (Inferential Statistics)</h4>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label>CT1 Theory (out of 40)</label>
+                    <input type="number" name="t_ct1_theory" class="form-control" min="0" max="40">
+                </div>
+
+                <div class="col-md-6">
+                    <label>CT2 Theory (out of 40)</label>
+                    <input type="number" name="t_ct2_theory" class="form-control" min="0" max="40">
+                </div>
+
+                <div class="col-md-6">
+                    <label>LLJ Project (out of 10)</label>
+                    <input type="number" name="t_llj" class="form-control" min="0" max="10">
+                </div>
+
+                <div class="col-md-6">
+                    <label>Quiz 1 (out of 15)</label>
+                    <input type="number" name="t_quiz1" class="form-control" min="0" max="15">
+                </div>
+
+                <div class="col-md-6">
+                    <label>Quiz 2 (out of 15)</label>
+                    <input type="number" name="t_quiz2" class="form-control" min="0" max="15">
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-4">
+            <button class="btn btn-primary btn-lg px-5">Calculate</button>
+        </div>
+    </form>
+
+    {% if result %}
+    <div class="card p-4 bg-light mt-4">
+        <h4>Your Internal Score: <strong>{{ result }} / 60</strong></h4>
+
+        <hr>
+
+        <h5>Theory Marks in Semester , Needed (out of 40):</h5>
+        <ul>
+            {% for percent, info in targets.items() %}
+            <li>
+                <strong>{{ percent }}%:</strong>
+                Need {{ info.needed }} marks (out of 40) —
+                <b>{{ info.needed_100 }}</b> marks (out of 100 exam)
+                {% if not info.feasible %}
+                    <span class="text-danger">— Not possible</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <script>
+        const selector = document.getElementById("subjectSelector");
+        const Jsec = document.getElementById("J_section");
+        const Tsec = document.getElementById("T_section");
+
+        selector.addEventListener("change", function () {
+            let val = this.value;
+
+            if (val === "FAI" || val === "ML" || val === "RMPE") {
+                Jsec.classList.remove("hidden");
+                Tsec.classList.add("hidden");
+            }
+            else if (val === "IS") {
+                Tsec.classList.remove("hidden");
+                Jsec.classList.add("hidden");
+            }
+            else {
+                Jsec.classList.add("hidden");
+                Tsec.classList.add("hidden");
+            }
+        });
+    </script>
+
+</body>
+</html>
